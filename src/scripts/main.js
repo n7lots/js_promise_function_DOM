@@ -1,16 +1,16 @@
 'use strict';
 
 function waitFor(element, eventName) {
-  return new Promise((resolve, reject) => {
+  if (!element || typeof element.addEventListener !== 'function') {
+    return Promise.reject(new Error('Invalid element'));
+  }
+
+  return new Promise((resolve) => {
     const handler = () => {
       resolve(
         `It was ${eventName} on the element: ${element.nodeName}, id: ${element.id}.`,
       );
     };
-
-    if (!element || typeof element.addEventListener !== 'function') {
-      return Promise.reject(new Error('Invalid element'));
-    }
 
     element.addEventListener(eventName, handler, { once: true });
   });
@@ -24,6 +24,13 @@ const printMessage = (message) => {
 
   document.body.append(div);
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { waitFor, printMessage };
+} else {
+  window.waitFor = waitFor;
+  window.printMessage = printMessage;
+}
 
 const loginField = document.getElementById('login');
 const passwordField = document.getElementById('password');
