@@ -1,16 +1,18 @@
 'use strict';
 
 function waitFor(element, eventName) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const handler = () => {
       resolve(
         `It was ${eventName} on the element: ${element.nodeName}, id: ${element.id}.`,
       );
-
-      element.removeEventListener(eventName, handler);
     };
 
-    element.addEventListener(eventName, handler);
+    if (!element || typeof element.addEventListener !== 'function') {
+      return Promise.reject(new Error('Invalid element'));
+    }
+
+    element.addEventListener(eventName, handler, { once: true });
   });
 }
 
